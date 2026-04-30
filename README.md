@@ -1,5 +1,17 @@
 # DesingMdCreate
 
+## Backend
+
+El servicio de extracción vive en `backend/` y expone `POST /api/extract` en `http://localhost:3001`.
+
+Para arrancarlo:
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.7.
 
 ## Development server
