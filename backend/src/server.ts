@@ -273,4 +273,5 @@ function normalizeUrl(input: string | undefined): string | null {
   }
 }
 
-await app.listen({ port: 3001, host: '0.0.0.0' });
+const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
+await app.listen({ port, host: '0.0.0.0' });
