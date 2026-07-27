@@ -36,6 +36,9 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
         <button type="button" class="secondary-button" (click)="loadExample()">
           Usar ejemplo
         </button>
+        <button type="button" class="ghost-button" (click)="openInfo()">
+          ¿Cómo funciona?
+        </button>
         <button type="button" class="ghost-button" (click)="openDetails()">
           Ver detalles
         </button>
@@ -48,21 +51,26 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
           {{ errorMessage() }}
         } @else if (status() === 'ready') {
           Markdown listo para copiar o descargar.
-        } @else {
-          Esperando una URL para preparar el análisis.
         }
       </p>
     </div>
 
-    <!-- Sección de Información (Cómo funciona) -->
-    <details class="info-section-details">
-      <summary class="info-summary">
-        ¿Cómo funciona?
-        <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-      </summary>
-      
-      <div class="info-content">
-        <p class="info-subtitle">Clona el "ADN visual" de cualquier página en 3 simples pasos.</p>
+  </section>
+
+  @if (infoOpen()) {
+    <div class="modal-backdrop" (click)="closeInfo()">
+      <section class="modal" role="dialog" aria-modal="true" aria-labelledby="info-title" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <p class="modal-kicker">Guía rápida</p>
+            <h2 id="info-title">Cómo funciona</h2>
+          </div>
+          <button type="button" class="close-button" (click)="closeInfo()" aria-label="Cerrar popup">
+            ×
+          </button>
+        </div>
+        
+        <p class="info-subtitle" style="text-align: left;">Clona el "ADN visual" de cualquier página en 3 simples pasos.</p>
         
         <div class="steps-grid">
           <article class="step-card">
@@ -72,7 +80,6 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
             <h3>1. Pega un enlace</h3>
             <p>Introduce la URL de cualquier página web cuyo diseño quieras tomar como inspiración.</p>
           </article>
-
           <article class="step-card">
             <div class="step-icon">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path><path d="M5 3v4"></path><path d="M19 17v4"></path><path d="M3 5h4"></path><path d="M17 19h4"></path></svg>
@@ -80,7 +87,6 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
             <h3>2. La IA hace la magia</h3>
             <p>Nuestro sistema la visita, toma capturas y analiza sus colores, fuentes y espaciados.</p>
           </article>
-
           <article class="step-card">
             <div class="step-icon">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>
@@ -89,9 +95,9 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
             <p>Obtén un archivo Markdown para dárselo a ChatGPT o a tu equipo de desarrollo.</p>
           </article>
         </div>
-      </div>
-    </details>
-  </section>
+      </section>
+    </div>
+  }
 
   @if (detailsOpen()) {
     <div class="modal-backdrop" (click)="closeDetails()">
@@ -143,7 +149,12 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
       </section>
     </div>
   }
-</main>
+    <!-- Creator Badge -->
+    <a href="https://dfv0624.com" target="_blank" rel="noopener noreferrer" class="creator-badge" aria-label="Creado por dfv0624">
+      <span class="creator-text">Desarrollado por</span>
+      <img src="Daniel.png" alt="Creador de la app" />
+    </a>
+  </main>
   `,
   styleUrl: './app.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -153,6 +164,7 @@ export class App {
   protected readonly status = signal<'idle' | 'loading' | 'ready' | 'error'>('idle');
   protected readonly copied = signal(false);
   protected readonly detailsOpen = signal(false);
+  protected readonly infoOpen = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly generatedMarkdown = signal('');
 
@@ -229,6 +241,14 @@ export class App {
     this.detailsOpen.set(false);
   }
 
+  protected openInfo(): void {
+    this.infoOpen.set(true);
+  }
+
+  protected closeInfo(): void {
+    this.infoOpen.set(false);
+  }
+
   protected async copyMarkdown(): Promise<void> {
     const markdown = this.markdownPreview();
 
@@ -295,7 +315,7 @@ export class App {
 
   private createBackendUrl(): string {
     const isLocalhost = globalThis.location?.hostname === 'localhost' || globalThis.location?.hostname === '127.0.0.1';
-    
+
     // IMPORTANTE: Cambia "tu-backend-url" por la URL real que Render le asignó a tu servicio backend
     const prodUrl = 'https://desingmdcreate.onrender.com/api/extract';
     const localUrl = 'http://127.0.0.1:3001/api/extract';
