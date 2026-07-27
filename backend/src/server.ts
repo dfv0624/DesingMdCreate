@@ -144,17 +144,53 @@ app.post('/api/extract', async (request: FastifyRequest<{ Body: ExtractBody }>, 
     // Cerramos el navegador tan pronto como no lo necesitemos para liberar recursos
     await browser.close().catch(() => undefined);
 
-    // Prompt detallado para Gemini
+    // Prompt detallado para Gemini basado en las instrucciones del Arquitecto de Sistemas de Diseño
     const prompt = `
-Eres un diseñador experto en sistemas de diseño y desarrollo frontend.
-He extraído los estilos computados, la estructura, los textos y una captura de pantalla completa de la página web solicitada.
-Tu tarea es generar un archivo DESIGN.md completo, elegante y bien estructurado basado en la información que te proporciono.
+Actúa como un experto Arquitecto de Sistemas de Diseño (Design System Architect) y Diseñador UI/UX Senior.
 
-El archivo DESIGN.md debe tener:
-1. Un Frontmatter YAML válido delimitado por \`---\` con tokens de diseño como colores (infiriendo del estilo o la imagen), tipografía, spacing, etc.
-2. Secciones explicativas sobre la intención de diseño (Overview, Colors, Typography, Layout, Components).
-3. Asegúrate de incluir un buen Overview e inferir el propósito principal del sitio analizando el texto (\`innerText\`) y la imagen.
-4. Solo debes responder con el texto exacto del archivo DESIGN.md, sin texto introductorio, ni saludos. Tampoco añadas \`\`\`markdown al inicio ni \`\`\` al final. Tu respuesta debe empezar directamente con \`---\`.
+Tu tarea es analizar exhaustivamente la siguiente página web/imagen (basado en los datos y captura adjuntos) y realizar ingeniería inversa para extraer su sistema de diseño.
+
+Debes generar un documento en formato Markdown (MD) estructurado estrictamente en las siguientes 9 secciones, manteniendo el mismo formato, tablas y uso de bloques de código (inline code) para los colores hexagonales y propiedades CSS:
+
+---
+version: 1.0.0
+# [AQUÍ PUEDES INCLUIR EL FRONTMATTER YAML CON TOKENS SI LO CONSIDERAS ÚTIL, pero la salida principal debe ser el MD en 9 secciones]
+---
+
+# Sistema de Diseño Inspirado en [Nombre de la Marca deducido]
+
+1. Tema Visual y Atmósfera
+Redacta 2-3 párrafos describiendo la personalidad, el tono, la densidad de información y la intención general de la interfaz (ej. minimalista, corporativa, lúdica, cuadrícula rota). Incluye una lista con 4-5 "Características Clave".
+
+2. Paleta de Colores y Roles
+Divide en subsecciones: Principales, Secundarios/Acentos, Superficies/Fondos, Neutros/Textos. Describe la función de cada uno e incluye el código Hexadecimal en formato de código en línea (ej. \`#FFFFFF\`).
+
+3. Reglas Tipográficas
+Identifica las familias de fuentes (Display y Text). Crea una tabla de Jerarquía con las columnas: Rol, Tamaño Aprox, Peso, Notas (incluye roles como Hero Titular, Títulos, Body, Etiquetas). Luego, añade una lista de "Principios" sobre cómo usan la tipografía (contraste, interlineado, etc.).
+
+4. Estilos de Componentes
+Describe detalladamente la geometría, bordes (border-radius), y comportamientos de:
+* Botones (Primarios, Secundarios, formas de píldora/cuadrados).
+* Tarjetas y Contenedores (Cards, sombras, bordes).
+* Navegación (Header, menús).
+* Tratamiento de Imágenes (recortes, bordes, superposiciones).
+
+5. Principios de Diseño de Interfaz (Layout)
+Explica el sistema de espaciado, el uso de la cuadrícula (grids), la alineación y la filosofía del espacio en blanco.
+
+6. Profundidad y Elevación
+Crea una tabla describiendo los niveles de profundidad (ej. Nivel 0, Nivel 1, Nivel 2) con las columnas: Nivel, Tratamiento (propiedades box-shadow o colores) y Uso. Explica brevemente la estrategia de profundidad (ej. sombras duras vs difusas).
+
+7. Qué hacer y Qué no hacer (Do's and Don'ts)
+Proporciona una lista concisa de 4 reglas estrictas de "Hacer (Do)" y 4 reglas de "No Hacer (Don't)" para mantener la coherencia visual de la marca.
+
+8. Comportamiento Responsivo
+Crea una tabla de Breakpoints inferidos con las columnas: Nombre (Móvil, Tablet, Desktop), y Cambios Clave (cómo colapsa el layout). Describe la estrategia de elementos táctiles y colapso de módulos.
+
+9. Guía de Prompts para Agentes
+Crea una "Referencia Rápida de Colores" en viñetas. Luego, redacta 3 "Ejemplos de Componentes", que sean prompts listos para que otra IA pueda generar componentes UI específicos combinando los colores, fuentes y radios de borde de esta marca.
+
+Restricciones: No inventes datos; si algo no es visible, infiérelo lógicamente basándote en las mejores prácticas de UI/UX, pero aclarando que es inferido. El formato final debe ser puro Markdown válido. No incluyas saludos ni explicaciones fuera del documento Markdown.
 
 Datos extraídos del DOM:
 ${JSON.stringify({ ...analysis, markdown: undefined }, null, 2)}
