@@ -53,6 +53,44 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
         }
       </p>
     </div>
+
+    <!-- Sección de Información (Cómo funciona) -->
+    <details class="info-section-details">
+      <summary class="info-summary">
+        ¿Cómo funciona?
+        <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </summary>
+      
+      <div class="info-content">
+        <p class="info-subtitle">Clona el "ADN visual" de cualquier página en 3 simples pasos.</p>
+        
+        <div class="steps-grid">
+          <article class="step-card">
+            <div class="step-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+            </div>
+            <h3>1. Pega un enlace</h3>
+            <p>Introduce la URL de cualquier página web cuyo diseño quieras tomar como inspiración.</p>
+          </article>
+
+          <article class="step-card">
+            <div class="step-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path><path d="M5 3v4"></path><path d="M19 17v4"></path><path d="M3 5h4"></path><path d="M17 19h4"></path></svg>
+            </div>
+            <h3>2. La IA hace la magia</h3>
+            <p>Nuestro sistema la visita, toma capturas y analiza sus colores, fuentes y espaciados.</p>
+          </article>
+
+          <article class="step-card">
+            <div class="step-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>
+            </div>
+            <h3>3. Listo para usar</h3>
+            <p>Obtén un archivo Markdown para dárselo a ChatGPT o a tu equipo de desarrollo.</p>
+          </article>
+        </div>
+      </div>
+    </details>
   </section>
 
   @if (detailsOpen()) {
