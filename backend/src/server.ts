@@ -53,18 +53,20 @@ app.post('/api/extract', async (request: FastifyRequest<{ Body: ExtractBody }>, 
     return reply.status(400).send({ error: 'Ingresa una URL válida.' });
   }
 
-  const browser = await chromium.launch({ 
-    headless: true,
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage', // Previene crashes por falta de memoria compartida en Render
-      '--disable-gpu',
-      '--single-process' // Ahorra memoria en el Free Tier de Render
-    ]
-  });
+  let browser;
 
   try {
+    browser = await chromium.launch({ 
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--single-process'
+      ]
+    });
+
     const page = await browser.newPage({
       viewport: { width: 1440, height: 1200 },
     });
@@ -249,7 +251,7 @@ ${JSON.stringify({ ...analysis, markdown: undefined }, null, 2)}
       details: error instanceof Error ? error.message : 'Unknown error',
     });
   } finally {
-    await browser.close().catch(() => undefined);
+    await browser?.close().catch(() => undefined);
   }
 });
 
