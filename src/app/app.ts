@@ -6,9 +6,9 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
 <main class="shell">
   <section class="hero">
     <p class="eyebrow">Design.md builder</p>
-    <h1>Convierte cualquier URL en un archivo .md estructurado.</h1>
+    <h1>Convierte cualquier URL en un archivo design.md</h1>
     <p class="lede">
-      Pega una página y genera una base limpia usando la estructura del DOM, enlaces visibles y contenido textual.
+      Pega una página y deja que la <strong> AI</strong> analice visualmente su estructura y diseño para generar un <strong>Sistema de Diseño</strong> completo.
     </p>
 
     <div class="input-block">
@@ -43,7 +43,7 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
 
       <p class="status-line">
         @if (status() === 'loading') {
-          Extrayendo estructura del DOM, contenido textual y señales de estilo...
+          Capturando pantalla y analizando el diseño con Inteligencia Artificial...
         } @else if (status() === 'error') {
           {{ errorMessage() }}
         } @else if (status() === 'ready') {
@@ -73,9 +73,9 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
           <article class="modal-panel">
             <p class="summary-label">Proceso</p>
             <ul>
-              <li>Leer la estructura visible del contenido y sus encabezados principales.</li>
-              <li>Detectar enlaces, listas, llamadas a la acción y jerarquía semántica.</li>
-              <li>Inferir señales de estilo como densidad, jerarquía, ritmo y tono editorial.</li>
+              <li><strong>Playwright</strong> navega a la URL y toma una captura de pantalla completa de alta resolución.</li>
+              <li>Extraemos los estilos computados y el texto semántico directamente del DOM.</li>
+              <li><strong>Gemini Flash</strong> actúa como Arquitecto de Diseño y realiza ingeniería inversa para extraer el sistema completo en Markdown.</li>
             </ul>
           </article>
 

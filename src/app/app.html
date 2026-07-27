@@ -1,7 +1,7 @@
 <main class="shell">
   <section class="hero">
     <p class="eyebrow">Design.md builder</p>
-    <h1>Convierte cualquier URL en un archivo .md estructurado.</h1>
+    <h1>Convierte cualquier URL en un archivo design.md</h1>
     <p class="lede">
       Pega una página y genera una base limpia para documentar color, tipografía, componentes y layout.
     </p>
@@ -9,15 +9,8 @@
     <div class="input-block">
       <label class="field" for="source-url">
         <span class="sr-only">URL de la página</span>
-        <input
-          id="source-url"
-          type="url"
-          autocomplete="off"
-          spellcheck="false"
-          placeholder="Pega una URL, por ejemplo https://www.apple.com/"
-          [value]="url()"
-          (input)="updateUrl($event)"
-        />
+        <input id="source-url" type="url" autocomplete="off" spellcheck="false"
+          placeholder="Pega una URL, por ejemplo https://www.apple.com/" [value]="url()" (input)="updateUrl($event)" />
       </label>
 
       <div class="actions">
@@ -34,58 +27,59 @@
 
       <p class="status-line">
         @if (status() === 'ready') {
-          Markdown listo para copiar o descargar.
+        Markdown listo para copiar o descargar.
         } @else {
-          Esperando una URL para preparar el análisis.
+        Esperando una URL para preparar el análisis.
         }
       </p>
     </div>
   </section>
 
   @if (detailsOpen()) {
-    <div class="modal-backdrop" (click)="closeDetails()">
-      <section class="modal" role="dialog" aria-modal="true" aria-labelledby="details-title" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <div>
-            <p class="modal-kicker">Popup informativo</p>
-            <h2 id="details-title">Qué hará la app</h2>
-          </div>
-
-          <button type="button" class="close-button" (click)="closeDetails()" aria-label="Cerrar popup">
-            ×
-          </button>
+  <div class="modal-backdrop" (click)="closeDetails()">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="details-title"
+      (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <p class="modal-kicker">Popup informativo</p>
+          <h2 id="details-title">Qué hará la app</h2>
         </div>
 
-        <div class="modal-grid">
-          <article class="modal-panel">
-            <p class="summary-label">Proceso</p>
-            <ul>
-              <li>Capturar la página renderizada y su jerarquía visual.</li>
-              <li>Detectar colores, tipografías, componentes y spacing dominante.</li>
-              <li>Exportar un Markdown con secciones reutilizables y legibles.</li>
-            </ul>
-          </article>
+        <button type="button" class="close-button" (click)="closeDetails()" aria-label="Cerrar popup">
+          ×
+        </button>
+      </div>
 
-          <article class="modal-panel modal-panel--dark">
-            <div class="preview-header">
-              <div>
-                <p class="summary-label">Vista previa</p>
-                <h3>Markdown inicial</h3>
-              </div>
+      <div class="modal-grid">
+        <article class="modal-panel">
+          <p class="summary-label">Proceso</p>
+          <ul>
+            <li>Capturar la página renderizada y su jerarquía visual.</li>
+            <li>Detectar colores, tipografías, componentes y spacing dominante.</li>
+            <li>Exportar un Markdown con secciones reutilizables y legibles.</li>
+          </ul>
+        </article>
 
-              <button type="button" class="copy-button" (click)="copyMarkdown()">
-                @if (copied()) {
-                  Copiado
-                } @else {
-                  Copiar texto
-                }
-              </button>
+        <article class="modal-panel modal-panel--dark">
+          <div class="preview-header">
+            <div>
+              <p class="summary-label">Vista previa</p>
+              <h3>Markdown inicial</h3>
             </div>
 
-            <pre class="markdown-output"><code>{{ markdownPreview() }}</code></pre>
-          </article>
-        </div>
-      </section>
-    </div>
+            <button type="button" class="copy-button" (click)="copyMarkdown()">
+              @if (copied()) {
+              Copiado
+              } @else {
+              Copiar texto
+              }
+            </button>
+          </div>
+
+          <pre class="markdown-output"><code>{{ markdownPreview() }}</code></pre>
+        </article>
+      </div>
+    </section>
+  </div>
   }
 </main>
