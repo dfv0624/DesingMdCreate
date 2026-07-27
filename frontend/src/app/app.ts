@@ -256,7 +256,13 @@ export class App {
   }
 
   private createBackendUrl(): string {
-    return 'http://127.0.0.1:3001/api/extract';
+    const isLocalhost = globalThis.location?.hostname === 'localhost' || globalThis.location?.hostname === '127.0.0.1';
+    
+    // IMPORTANTE: Cambia "tu-backend-url" por la URL real que Render le asignó a tu servicio backend
+    const prodUrl = 'https://desingmdcreate.onrender.com/api/extract';
+    const localUrl = 'http://127.0.0.1:3001/api/extract';
+
+    return isLocalhost ? localUrl : prodUrl;
   }
 
   private buildPlaceholderMarkdown(sourceUrl: string): string {
