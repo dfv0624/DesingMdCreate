@@ -53,7 +53,16 @@ app.post('/api/extract', async (request: FastifyRequest<{ Body: ExtractBody }>, 
     return reply.status(400).send({ error: 'Ingresa una URL válida.' });
   }
 
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({ 
+    headless: true,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage', // Previene crashes por falta de memoria compartida en Render
+      '--disable-gpu',
+      '--single-process' // Ahorra memoria en el Free Tier de Render
+    ]
+  });
 
   try {
     const page = await browser.newPage({
