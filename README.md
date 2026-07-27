@@ -1,71 +1,58 @@
-# DesingMdCreate
+# Design MD Create
 
-## Backend
+**Design MD Create** es una herramienta automatizada para desarrolladores y diseñadores que extrae tokens de diseño, colores, tipografías y estructura directamente desde cualquier página web y genera automáticamente un archivo `DESIGN.md` con todo el sistema de diseño.
 
-El servicio de extracción vive en `backend/` y expone `POST /api/extract` en `http://localhost:3001`.
+Este proyecto utiliza **Playwright** para analizar el DOM real y **Google Gemini AI** para entender el contexto visual (mediante capturas de pantalla completas) y semántico de la web.
 
-Para arrancarlo:
+## 🚀 Arquitectura del Proyecto
 
+El proyecto está dividido en dos partes principales:
+
+- **`/src` (Frontend):** Aplicación desarrollada en Angular (v21) que permite ingresar una URL y visualizar el diseño generado de forma estructurada.
+- **`/backend` (Servidor AI):** Servidor Node.js + Fastify que utiliza Playwright para navegar por la web solicitada de forma invisible y la API de Gemini para procesar la información.
+
+## 🤖 Integración con Inteligencia Artificial
+
+El backend cuenta con una integración avanzada con el modelo **`gemini-flash-latest`** de Google AI Studio. 
+El flujo de extracción funciona de la siguiente manera:
+1. El backend recibe la URL deseada.
+2. Un navegador sin interfaz (Headless) carga la página.
+3. Se extraen estilos CSS computados (colores, fuentes, botones, headings) y todo el texto legible (`innerText`).
+4. Se toma una captura de pantalla completa de alta resolución.
+5. Todo este paquete de datos visuales y estructurales se envía a la IA (Gemini).
+6. Gemini analiza la web como un diseñador experto y devuelve un archivo `DESIGN.md` profesional.
+
+## ⚙️ Configuración e Instalación
+
+### 1. Variables de Entorno (Importante)
+Necesitas una API Key gratuita de Google AI Studio.
+1. Entra a [Google AI Studio](https://aistudio.google.com/app/apikey).
+2. Crea una clave en un **Nuevo Proyecto** (sin facturación para la capa gratuita).
+3. Duplica el archivo `backend/.env.example`, nómbralo `backend/.env` y pega ahí tu API Key:
+   ```env
+   GEMINI_API_KEY=tu_nueva_api_key_aqui
+   ```
+
+### 2. Arrancar el Backend
+Abre una terminal y ejecuta:
 ```bash
 cd backend
 npm install
 npm run dev
 ```
+El servidor escuchará en el puerto `3001`.
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.7.
-
-## Development server
-
-To start a local development server, run:
-
+### 3. Arrancar el Frontend
+Abre otra pestaña en tu terminal y ejecuta:
 ```bash
+npm install
 ng serve
 ```
+Abre tu navegador en `http://localhost:4200/`.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## 🛠 Tecnologías Utilizadas
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- **Frontend:** Angular 21, TypeScript
+- **Backend:** Node.js, Fastify, TypeScript
+- **Scraping:** Playwright
+- **Inteligencia Artificial:** Google Gen AI SDK (`@google/genai`), Modelo Flash
