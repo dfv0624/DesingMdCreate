@@ -33,9 +33,6 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
             Generar design.md
           }
         </button>
-        <button type="button" class="secondary-button" (click)="loadExample()">
-          Usar ejemplo
-        </button>
         <button type="button" class="ghost-button" (click)="openInfo()">
           ¿Cómo funciona?
         </button>
@@ -227,11 +224,6 @@ export class App {
     }
   }
 
-  protected loadExample(): void {
-    this.url.set('https://www.apple.com/');
-    this.status.set('idle');
-    this.errorMessage.set(null);
-  }
 
   protected openDetails(): void {
     this.detailsOpen.set(true);
