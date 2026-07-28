@@ -309,7 +309,7 @@ export class App {
     const isLocalhost = globalThis.location?.hostname === 'localhost' || globalThis.location?.hostname === '127.0.0.1';
 
     // IMPORTANTE: Cambia "tu-backend-url" por la URL real que Render le asignó a tu servicio backend
-    const prodUrl = 'https://desingmdcreate.onrender.com/api/extract';
+    const prodUrl = 'https://design-md-backend-production.up.railway.app/api/extract';
     const localUrl = 'http://127.0.0.1:3001/api/extract';
 
     return isLocalhost ? localUrl : prodUrl;
