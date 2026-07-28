@@ -1,0 +1,5 @@
+providers = ["node"]
+
+[variables]
+NIXPACKS_PLAYWRIGHT = "1"
+PLAYWRIGHT_BROWSERS_PATH = "0"
