@@ -245,10 +245,13 @@ ${JSON.stringify({ ...analysis, markdown: undefined }, null, 2)}
     }
 
   } catch (error) {
-    request.log.error({ error }, 'Failed to extract page data');
+    const details = error instanceof Error ? error.message : 'Unknown error';
+    // `err` conserva el stack en los logs de Fastify/Pino y `details` hace que
+    // Railway muestre el motivo aunque su visor compacte los objetos JSON.
+    request.log.error({ err: error, details }, 'Failed to extract page data');
     return reply.status(500).send({
       error: 'No se pudo extraer la página.',
-      details: error instanceof Error ? error.message : 'Unknown error',
+      details,
     });
   } finally {
     await browser?.close().catch(() => undefined);

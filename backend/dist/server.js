@@ -15,8 +15,18 @@ app.post('/api/extract', async (request, reply) => {
     if (!normalizedUrl) {
         return reply.status(400).send({ error: 'Ingresa una URL válida.' });
     }
-    const browser = await chromium.launch({ headless: true });
+    let browser;
     try {
+        browser = await chromium.launch({
+            headless: true,
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-gpu',
+                '--single-process'
+            ]
+        });
         const page = await browser.newPage({
             viewport: { width: 1440, height: 1200 },
         });
@@ -143,7 +153,7 @@ ${JSON.stringify({ ...analysis, markdown: undefined }, null, 2)}
 `;
         try {
             const response = await ai.models.generateContent({
-                model: 'gemini-flash-latest',
+                model: 'gemini-3.5-flash',
                 contents: [
                     prompt,
                     {
@@ -177,14 +187,17 @@ ${JSON.stringify({ ...analysis, markdown: undefined }, null, 2)}
         }
     }
     catch (error) {
-        request.log.error({ error }, 'Failed to extract page data');
+        const details = error instanceof Error ? error.message : 'Unknown error';
+        // `err` conserva el stack en los logs de Fastify/Pino y `details` hace que
+        // Railway muestre el motivo aunque su visor compacte los objetos JSON.
+        request.log.error({ err: error, details }, 'Failed to extract page data');
         return reply.status(500).send({
             error: 'No se pudo extraer la página.',
-            details: error instanceof Error ? error.message : 'Unknown error',
+            details,
         });
     }
     finally {
-        await browser.close().catch(() => undefined);
+        await browser?.close().catch(() => undefined);
     }
 });
 function normalizeUrl(input) {
@@ -204,4 +217,5 @@ function normalizeUrl(input) {
         }
     }
 }
-await app.listen({ port: 3001, host: '0.0.0.0' });
+const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
+await app.listen({ port, host: '0.0.0.0' });

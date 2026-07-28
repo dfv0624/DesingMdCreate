@@ -205,7 +205,10 @@ export class App {
 
       if (!response.ok) {
         const errorBody = await response.json().catch(() => null) as { error?: string; details?: string } | null;
-        throw new Error(errorBody?.error || errorBody?.details || `No se pudo leer la URL (${response.status}).`);
+        const message = errorBody?.details
+          ? `${errorBody.error ?? 'Error del backend'} ${errorBody.details}`
+          : errorBody?.error ?? `No se pudo leer la URL (${response.status}).`;
+        throw new Error(message);
       }
 
       const analysis = await response.json() as { markdown?: string; error?: string; details?: string };
