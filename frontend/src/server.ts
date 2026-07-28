@@ -10,6 +10,7 @@ import { join } from 'node:path';
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
+app.set('trust proxy', true); // Necesario para que Angular confíe en el proxy de Railway
 const angularApp = new AngularNodeAppEngine();
 
 /**
