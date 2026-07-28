@@ -209,7 +209,7 @@ ${JSON.stringify({ ...analysis, markdown: undefined }, null, 2)}
 
     try {
       const response = await ai.models.generateContent({
-        model: 'gemini-flash-latest',
+        model: 'gemini-1.5-flash',
         contents: [
           prompt,
           {
