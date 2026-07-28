@@ -1,0 +1,6 @@
+# Railway puede construir este servicio con Nixpacks/Railpack en vez del
+# Dockerfile. Instala las dependencias del sistema que Chromium necesita para
+# que Playwright pueda arrancar en ese tipo de imagen.
+[phases.playwright]
+dependsOn = ["install"]
+cmds = ["npx playwright install-deps chromium"]
