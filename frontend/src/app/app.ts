@@ -113,8 +113,8 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
       <section class="modal" role="dialog" aria-modal="true" aria-labelledby="details-title" (click)="$event.stopPropagation()">
         <div class="modal-header">
           <div>
-            <p class="modal-kicker">Popup informativo</p>
-            <h2 id="details-title">Qué hará la app</h2>
+            <p class="modal-kicker">Resultado generado</p>
+            <h2 id="details-title">Vista previa de tu design.md</h2>
           </div>
 
           <button type="button" class="close-button" (click)="closeDetails()" aria-label="Cerrar popup">
@@ -130,17 +130,19 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
                 <h3>Markdown inicial</h3>
               </div>
 
-              <button type="button" class="copy-button" (click)="copyMarkdown()">
-                @if (copied()) {
-                  Copiado
-                } @else {
-                  Copiar texto
-                }
-              </button>
+              <div class="preview-actions">
+                <button type="button" class="copy-button" (click)="copyMarkdown()">
+                  @if (copied()) {
+                    Copiado
+                  } @else {
+                    Copiar texto
+                  }
+                </button>
 
-              <button type="button" class="copy-button" (click)="downloadMarkdown()">
-                Descargar
-              </button>
+                <button type="button" class="copy-button" (click)="downloadMarkdown()">
+                  Descargar
+                </button>
+              </div>
             </div>
 
             <pre class="markdown-output"><code>{{ markdownPreview() }}</code></pre>

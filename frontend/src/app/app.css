@@ -282,6 +282,13 @@
   margin-bottom: 16px;
 }
 
+.preview-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
 .markdown-output {
   margin: 0;
   overflow: auto;
@@ -346,6 +353,10 @@
   .modal-header,
   .preview-header {
     flex-direction: column;
+  }
+
+  .preview-actions {
+    margin-left: 0;
   }
 }
 
