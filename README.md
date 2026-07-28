@@ -1,58 +1,71 @@
-# Design MD Create
+# 🎨 Design.md Builder
 
-**Design MD Create** es una herramienta automatizada para desarrolladores y diseñadores que extrae tokens de diseño, colores, tipografías y estructura directamente desde cualquier página web y genera automáticamente un archivo `DESIGN.md` con todo el sistema de diseño.
+> **Convierte cualquier URL en un Sistema de Diseño estructurado en segundos.**
 
-Este proyecto utiliza **Playwright** para analizar el DOM real y **Google Gemini AI** para entender el contexto visual (mediante capturas de pantalla completas) y semántico de la web.
+**Design.md Builder** es una herramienta inteligente para desarrolladores y diseñadores. Mediante el uso de **Playwright** y la Inteligencia Artificial de **Google (Gemini)**, extrae tokens de diseño (colores, tipografías, espaciados y estructura) directamente desde el DOM de cualquier página web y genera automáticamente un archivo `DESIGN.md` altamente profesional y detallado.
 
-## 🚀 Arquitectura del Proyecto
+---
 
-El proyecto está dividido en dos partes principales:
+## ✨ Características Principales
 
-- **`/src` (Frontend):** Aplicación desarrollada en Angular (v21) que permite ingresar una URL y visualizar el diseño generado de forma estructurada.
-- **`/backend` (Servidor AI):** Servidor Node.js + Fastify que utiliza Playwright para navegar por la web solicitada de forma invisible y la API de Gemini para procesar la información.
+- 🔍 **Análisis Profundo:** Un navegador sin interfaz (Headless) inspecciona la web solicitada, extrae estilos computados (CSS), y estructura semántica.
+- 👁️ **Contexto Visual con IA:** Captura una imagen completa en alta resolución para que el modelo `gemini-flash-latest` interprete el contexto visual de la página de la misma manera que lo haría un diseñador experto.
+- 📐 **Ingeniería Inversa:** Genera de forma automática paletas de color, reglas tipográficas, estilos de componentes y diseño de layout.
+- ⚡ **Desempeño y Reactividad:** Frontend moderno y ultrarrápido construido en **Angular v21** que ofrece retroalimentación visual interactiva mientras la IA procesa.
+- 📦 **Listo para Exportar:** Permite copiar en el portapapeles o descargar directamente el archivo `.md` generado con un solo clic.
 
-## 🤖 Integración con Inteligencia Artificial
+---
 
-El backend cuenta con una integración avanzada con el modelo **`gemini-flash-latest`** de Google AI Studio. 
-El flujo de extracción funciona de la siguiente manera:
-1. El backend recibe la URL deseada.
-2. Un navegador sin interfaz (Headless) carga la página.
-3. Se extraen estilos CSS computados (colores, fuentes, botones, headings) y todo el texto legible (`innerText`).
-4. Se toma una captura de pantalla completa de alta resolución.
-5. Todo este paquete de datos visuales y estructurales se envía a la IA (Gemini).
-6. Gemini analiza la web como un diseñador experto y devuelve un archivo `DESIGN.md` profesional.
+## 🛠 Arquitectura y Tecnologías
 
-## ⚙️ Configuración e Instalación
+El proyecto se divide en dos entornos altamente optimizados:
 
-### 1. Variables de Entorno (Importante)
-Necesitas una API Key gratuita de Google AI Studio.
-1. Entra a [Google AI Studio](https://aistudio.google.com/app/apikey).
-2. Crea una clave en un **Nuevo Proyecto** (sin facturación para la capa gratuita).
-3. Duplica el archivo `backend/.env.example`, nómbralo `backend/.env` y pega ahí tu API Key:
-   ```env
-   GEMINI_API_KEY=tu_nueva_api_key_aqui
-   ```
+### 🖥️ Frontend (`/frontend`)
+Aplicación SPA moderna que actúa como interfaz del usuario.
+* **Framework:** Angular 21 (TypeScript, SSR)
+* **Diseño:** Vanilla CSS puro enfocado en la usabilidad y la estética (Dark mode, glassmorphism, UI fluida).
 
-### 2. Arrancar el Backend
-Abre una terminal y ejecuta:
+### ⚙️ Backend AI (`/backend`)
+Microservicio que maneja la inspección de DOM, toma de capturas y comunicación con la IA.
+* **Framework:** Node.js + Fastify
+* **Scraping Avanzado:** Playwright
+* **Inteligencia Artificial:** Google Gen AI SDK (`@google/genai`)
+
+---
+
+## 🚀 Instalación y Uso Local
+
+El entorno está preparado para ejecutarse sin configuraciones adicionales de API, ya que por defecto se conecta de forma dinámica al servicio de producción. 
+
+### 1. Inicializar el Backend
+*(Ejecuta el backend si deseas procesar las URLs localmente para debug)*
 ```bash
 cd backend
 npm install
 npm run dev
 ```
-El servidor escuchará en el puerto `3001`.
+*(El servidor de pruebas se escuchará en el puerto `3001`)*
 
-### 3. Arrancar el Frontend
+### 2. Inicializar el Frontend
 Abre otra pestaña en tu terminal y ejecuta:
 ```bash
+cd frontend
 npm install
-ng serve
+npm run dev
 ```
-Abre tu navegador en `http://localhost:4200/`.
+*(La aplicación se abrirá en tu navegador en `http://localhost:4200/`)*
 
-## 🛠 Tecnologías Utilizadas
+---
 
-- **Frontend:** Angular 21, TypeScript
-- **Backend:** Node.js, Fastify, TypeScript
-- **Scraping:** Playwright
-- **Inteligencia Artificial:** Google Gen AI SDK (`@google/genai`), Modelo Flash
+## 💡 ¿Cómo funciona el flujo interno?
+
+1. **Ingreso:** El usuario facilita la URL objetivo en la web.
+2. **Scraping Invisible:** Fastify utiliza Playwright para navegar a la URL simulando un usuario real y espera a que el DOM y el tráfico de red se estabilicen.
+3. **Data Harvesting:** Se obtiene todo el texto legible (`innerText`) y los CSS computed styles de componentes clave. Paralelamente, se toma un _Full Page Screenshot_.
+4. **Razonamiento AI:** Los datos extraídos y la captura visual son enviados a Gemini, quien procesa la información aplicando principios arquitectónicos de sistemas de diseño.
+5. **Salida Estructurada:** Se devuelve un archivo `DESIGN.md` con 9 apartados (Tema visual, Colores, Tipografías, Prompts para Agentes, etc.)
+
+---
+
+## 👨‍💻 Créditos
+Desarrollado para revolucionar el flujo de trabajo entre diseño y desarrollo web por dfv0624.

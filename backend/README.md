@@ -15,7 +15,6 @@ Este servicio es el motor detrás de la generación de sistemas de diseño autom
 
 - Node.js 20+
 - Instalar dependencias con `npm install` dentro de `backend/`
-- API Key válida de Google AI Studio configurada en un archivo `.env` (ver `.env.example`).
 
 ## 💻 Desarrollo
 
