@@ -11,7 +11,10 @@ const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
 app.set('trust proxy', true); // Necesario para que Angular confíe en el proxy de Railway
-const angularApp = new AngularNodeAppEngine();
+const angularApp = new AngularNodeAppEngine({
+  trustProxyHeaders: true,
+  allowedHosts: ['desing-md-create-production.up.railway.app']
+});
 
 /**
  * Example Express Rest API endpoints can be defined here.
