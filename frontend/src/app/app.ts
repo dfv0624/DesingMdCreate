@@ -41,15 +41,27 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
         </button>
       </div>
 
-      <p class="status-line">
-        @if (status() === 'loading') {
-          Capturando pantalla y analizando el diseño con Inteligencia Artificial...
-        } @else if (status() === 'error') {
-          {{ errorMessage() }}
-        } @else if (status() === 'ready') {
-          Markdown listo para copiar o descargar.
-        }
-      </p>
+      @if (status() === 'loading') {
+        <div class="loading-status" role="status" aria-live="polite">
+          <div class="loading-header">
+            <span>Creando tu design.md</span>
+            <span>{{ loadingProgress() }}%</span>
+          </div>
+          <div
+            class="progress-track"
+            role="progressbar"
+            aria-label="Progreso del análisis"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            [attr.aria-valuenow]="loadingProgress()"
+          >
+            <span class="progress-bar" [style.width.%]="loadingProgress()"></span>
+          </div>
+          <p class="loading-message">{{ loadingMessage() }}</p>
+        </div>
+      } @else if (status() === 'ready') {
+        <p class="status-line">Markdown listo para copiar o descargar.</p>
+      }
     </div>
 
   </section>
@@ -110,16 +122,7 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
           </button>
         </div>
 
-        <div class="modal-grid">
-          <article class="modal-panel">
-            <p class="summary-label">Proceso</p>
-            <ul>
-              <li><strong>Playwright</strong> navega a la URL y toma una captura de pantalla completa de alta resolución.</li>
-              <li>Extraemos los estilos computados y el texto semántico directamente del DOM.</li>
-              <li><strong>Gemini Flash</strong> actúa como Arquitecto de Diseño y realiza ingeniería inversa para extraer el sistema completo en Markdown.</li>
-            </ul>
-          </article>
-
+        <div class="modal-grid modal-grid--preview">
           <article class="modal-panel modal-panel--dark">
             <div class="preview-header">
               <div>
@@ -158,12 +161,22 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
 })
 export class App {
   protected readonly url = signal('');
-  protected readonly status = signal<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  protected readonly status = signal<'idle' | 'loading' | 'ready'>('idle');
   protected readonly copied = signal(false);
   protected readonly detailsOpen = signal(false);
   protected readonly infoOpen = signal(false);
-  protected readonly errorMessage = signal<string | null>(null);
   protected readonly generatedMarkdown = signal('');
+  protected readonly loadingProgress = signal(0);
+  private readonly loadingMessages = [
+    'Preparamos la página para descubrir su lenguaje visual.',
+    'Analizamos colores, tipografías, espaciados y componentes.',
+    '¿Sabías que un archivo design.md le da a tu IA el contexto para crear interfaces impresionantes y coherentes?',
+    'Convertimos las decisiones visuales en una guía reutilizable para tu equipo.',
+  ];
+  private readonly loadingMessageIndex = signal(0);
+  protected readonly loadingMessage = computed(() => this.loadingMessages[this.loadingMessageIndex()]);
+  private progressTimer: ReturnType<typeof globalThis.setInterval> | undefined;
+  private messageTimer: ReturnType<typeof globalThis.setInterval> | undefined;
 
   protected readonly normalizedUrl = computed(() => this.url().trim());
   protected readonly canGenerate = computed(() => {
@@ -185,13 +198,12 @@ export class App {
     const sourceUrl = this.normalizeUrl(this.url());
 
     if (!sourceUrl) {
-      this.status.set('error');
-      this.errorMessage.set('Ingresa una URL válida para empezar.');
+      this.status.set('idle');
       return;
     }
 
     this.status.set('loading');
-    this.errorMessage.set(null);
+    this.startLoadingExperience();
     this.copied.set(false);
 
     try {
@@ -222,8 +234,11 @@ export class App {
       this.detailsOpen.set(true);
     } catch (error: unknown) {
       this.generatedMarkdown.set('');
-      this.status.set('error');
-      this.errorMessage.set(this.formatError(error));
+      // Los detalles técnicos quedan en consola para diagnóstico, no en la interfaz.
+      console.error('No se pudo generar el design.md.', error);
+      this.status.set('idle');
+    } finally {
+      this.stopLoadingExperience();
     }
   }
 
@@ -277,7 +292,33 @@ export class App {
   protected setUrl(value: string): void {
     this.url.set(value);
     this.status.set('idle');
-    this.errorMessage.set(null);
+  }
+
+  private startLoadingExperience(): void {
+    this.stopLoadingExperience();
+    this.loadingProgress.set(8);
+    this.loadingMessageIndex.set(0);
+
+    this.progressTimer = globalThis.setInterval(() => {
+      this.loadingProgress.update((progress) => Math.min(progress + 7, 92));
+    }, 900);
+    this.messageTimer = globalThis.setInterval(() => {
+      this.loadingMessageIndex.update((index) => (index + 1) % this.loadingMessages.length);
+    }, 2800);
+  }
+
+  private stopLoadingExperience(): void {
+    if (this.progressTimer) {
+      globalThis.clearInterval(this.progressTimer);
+      this.progressTimer = undefined;
+    }
+
+    if (this.messageTimer) {
+      globalThis.clearInterval(this.messageTimer);
+      this.messageTimer = undefined;
+    }
+
+    this.loadingProgress.set(100);
   }
 
   protected updateUrl(event: Event): void {
@@ -589,14 +630,6 @@ export class App {
       .map((line) => line.replace(/^(\*\s+|[-+]\s+)/, '').trim())
       .filter((line) => line.length > 0)
       .slice(0, 8);
-  }
-
-  private formatError(error: unknown): string {
-    if (error instanceof Error) {
-      return error.message;
-    }
-
-    return 'No se pudo generar el Markdown desde la URL indicada.';
   }
 
   private buildFileName(): string {

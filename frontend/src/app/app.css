@@ -159,6 +159,51 @@
   line-height: 1.5;
 }
 
+.loading-status {
+  margin: 22px auto 0;
+  width: min(500px, 100%);
+  text-align: left;
+}
+
+.loading-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 9px;
+  color: #1d1d1f;
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+
+.loading-header span:last-child {
+  color: #0071e3;
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e6e6eb;
+}
+
+.progress-bar {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #0071e3, #54a9ff);
+  transition: width 0.75s ease-out;
+}
+
+.loading-message {
+  min-height: 3em;
+  margin: 12px 0 0;
+  color: #6e6e73;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -202,6 +247,10 @@
   grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
   gap: 18px;
   align-items: stretch;
+}
+
+.modal-grid--preview {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .modal-panel {
