@@ -5,6 +5,9 @@ import { chromium } from 'playwright';
 import { GoogleGenAI } from '@google/genai';
 // Inicializar Gemini
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const MODEL_CACHE_TTL_MS = 15 * 60 * 1000;
+let cachedGenerationModels = [];
+let modelCacheExpiresAt = 0;
 const app = Fastify({ logger: true });
 await app.register(cors, {
     origin: true,
@@ -152,22 +155,43 @@ Datos extraídos del DOM:
 ${JSON.stringify({ ...analysis, markdown: undefined }, null, 2)}
 `;
         try {
-            const response = await ai.models.generateContent({
-                model: 'gemini-3.5-flash',
-                contents: [
-                    prompt,
-                    {
-                        inlineData: {
-                            mimeType: 'image/jpeg',
-                            data: screenshotBase64,
+            let generatedMarkdown = '';
+            let selectedModel = '';
+            let lastAiError;
+            const generationModels = await getGenerationModels();
+            for (const [index, model] of generationModels.entries()) {
+                try {
+                    const response = await ai.models.generateContent({
+                        model,
+                        contents: [
+                            prompt,
+                            {
+                                inlineData: {
+                                    mimeType: 'image/jpeg',
+                                    data: screenshotBase64,
+                                }
+                            }
+                        ],
+                        config: {
+                            temperature: 0.2, // Baja temperatura para generar archivos de configuración estables
                         }
-                    }
-                ],
-                config: {
-                    temperature: 0.2, // Baja temperatura para generar archivos de configuración estables
+                    });
+                    generatedMarkdown = response.text || '';
+                    selectedModel = model;
+                    break;
                 }
-            });
-            let generatedMarkdown = response.text || '';
+                catch (error) {
+                    lastAiError = error;
+                    const hasFallback = index < generationModels.length - 1;
+                    if (!hasFallback || !isModelUnderHighDemand(error)) {
+                        throw error;
+                    }
+                    request.log.warn({ err: error, failedModel: model, nextModel: generationModels[index + 1] }, 'Gemini model is busy; trying fallback model');
+                }
+            }
+            if (!selectedModel) {
+                throw lastAiError ?? new Error('No Gemini model was available.');
+            }
             // Limpieza de formato en caso de que el modelo decida añadir bloques de código
             if (generatedMarkdown.startsWith('```markdown')) {
                 generatedMarkdown = generatedMarkdown.replace(/^```markdown\n/, '').replace(/\n```$/, '');
@@ -180,9 +204,12 @@ ${JSON.stringify({ ...analysis, markdown: undefined }, null, 2)}
         }
         catch (aiError) {
             request.log.error({ aiError }, 'Failed to generate content with Gemini');
-            return reply.status(500).send({
+            const isHighDemand = isModelUnderHighDemand(aiError);
+            return reply.status(isHighDemand ? 503 : 500).send({
                 error: 'Error al generar el diseño con Inteligencia Artificial.',
-                details: aiError instanceof Error ? aiError.message : 'Unknown AI error',
+                details: isHighDemand
+                    ? 'Todos los modelos de IA están temporalmente ocupados. Inténtalo de nuevo en unos minutos.'
+                    : aiError instanceof Error ? aiError.message : 'Unknown AI error',
             });
         }
     }
@@ -200,6 +227,65 @@ ${JSON.stringify({ ...analysis, markdown: undefined }, null, 2)}
         await browser?.close().catch(() => undefined);
     }
 });
+function isModelUnderHighDemand(error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return /\b(503|429)\b|high demand|unavailable|overloaded|resource exhausted/i.test(message);
+}
+async function getGenerationModels() {
+    if (cachedGenerationModels.length > 0 && Date.now() < modelCacheExpiresAt) {
+        return cachedGenerationModels;
+    }
+    try {
+        const pager = await ai.models.list({ config: { queryBase: true } });
+        const models = [];
+        for await (const model of pager) {
+            const modelName = model.name?.replace(/^models\//, '');
+            const supportsGeneration = !model.supportedActions?.length
+                || model.supportedActions.some((action) => action.toLowerCase() === 'generatecontent');
+            if (modelName?.startsWith('gemini-') && supportsGeneration) {
+                models.push(modelName);
+            }
+        }
+        cachedGenerationModels = [...new Set(models)].sort(compareGenerationModels);
+        modelCacheExpiresAt = Date.now() + MODEL_CACHE_TTL_MS;
+        if (cachedGenerationModels.length > 0) {
+            return cachedGenerationModels;
+        }
+    }
+    catch (error) {
+        // La generación continúa aunque la consulta del catálogo falle temporalmente.
+        console.warn('Could not retrieve available Gemini models; using the latest Flash alias.', error);
+    }
+    return ['gemini-flash-latest'];
+}
+function compareGenerationModels(left, right) {
+    const rank = (model) => {
+        // Se priorizan los modelos de texto con mayor cuota actual (RPM/RPD).
+        // Los demás siguen siendo alternativas descubiertas automáticamente.
+        if (model.includes('3.1-flash-lite'))
+            return 0;
+        if (model.includes('3.5-flash-lite'))
+            return 1;
+        if (model.includes('2.5-flash-lite'))
+            return 2;
+        if (model.includes('3.6-flash'))
+            return 3;
+        if (model.includes('3-flash'))
+            return 4;
+        if (model.includes('2.5-flash'))
+            return 5;
+        if (model.includes('3.5-flash'))
+            return 6;
+        if (model.includes('flash-lite'))
+            return 7;
+        if (model.includes('flash'))
+            return 8;
+        if (model.includes('pro'))
+            return 9;
+        return 10;
+    };
+    return rank(left) - rank(right) || right.localeCompare(left, undefined, { numeric: true });
+}
 function normalizeUrl(input) {
     const value = input?.trim();
     if (!value) {
