@@ -7,7 +7,7 @@
     "dev": "tsx watch src/server.ts",
     "start": "tsx src/server.ts",
     "build": "tsc -p tsconfig.json",
-    "postinstall": "npx playwright install chromium --with-deps"
+    "postinstall": "npx playwright install chromium"
   },
   "dependencies": {
     "@fastify/cors": "^11.0.0",
